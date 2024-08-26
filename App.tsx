@@ -1,117 +1,76 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+// Core imports
+import React, {useState} from 'react';
+import {Text, StyleSheet, ScrollView} from 'react-native';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+// User imports
+import Gender from './components/Gender';
+import {clamp, min} from './components/Dimenions';
+import SlideInput from './components/SlideInput';
+import IncDecInput from './components/IncDecInput';
+import Grid from './components/Grid';
+import Button from './components/Button';
+import BMIModal from './components/Modal';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const App = (): React.ReactNode => {
+  const [height, setHeight] = useState<number>(182.28);
+  const [weight, setWeight] = useState<number>(50);
+  const [age, setAge] = useState<number>(18);
+  const [modalState, setModalState] = useState<boolean>(false);
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+  const closeModal = (): void => setModalState(false);
+  const openModal = (): void => setModalState(true);
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  const heightHandler = (value: number): void => setHeight(value);
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
+    <>
+      <Text style={styles.title}>BMI CALCULATOR</Text>
+      <ScrollView>
+        <Grid style={styles.wrapper} direction="column">
+          <Gender />
+          <SlideInput
+            roundOffTo={2}
+            title="Height"
+            value={height}
+            valueHandler={heightHandler}
+            unit="cm"
+          />
+          <Grid>
+            <IncDecInput title="Weight" value={weight} setValue={setWeight} />
+            <IncDecInput title="Age" value={age} setValue={setAge} />
+          </Grid>
+          <Button
+            title="Calculate"
+            onPress={openModal}
+            style={styles.calcBtn}
+          />
+        </Grid>
       </ScrollView>
-    </SafeAreaView>
+      <BMIModal
+        weight={weight}
+        height={height}
+        closeModal={closeModal}
+        state={modalState}
+      />
+    </>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  title: {
+    color: '#fff',
+    backgroundColor: '#0c1035',
+    padding: clamp(16, 36, 48),
+    fontSize: min(24, 32),
+    letterSpacing: 2,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+
+  wrapper: {
+    padding: clamp(12, 32, 48),
+    backgroundColor: '#0b1024',
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  calcBtn: {
+    paddingVertical: clamp(16, 20, 24),
   },
 });
 
